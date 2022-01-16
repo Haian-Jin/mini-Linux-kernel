@@ -68,17 +68,16 @@ void task_init() {
                 rootPGT[i] =  swapper_pg_dir[i];
             }
             
-            //  map user stack and user program from VA to PA
+            // map user stack and user program from VA to PA
             // We can notice that several user processes may have the VA mapping to different PA
             // stack 
             create_mapping(rootPGT,  USER_END-PGSIZE ,  (unsigned long )user_stack - PA2VA_OFFSET,  PGSIZE , 0b10111);
             // user program
-            // printk("%lx\n", uapp_start);
             create_mapping(rootPGT,  USER_START ,  (unsigned long)uapp_start-PA2VA_OFFSET, (unsigned long)uapp_end -  (unsigned long)uapp_start, 0b11111);
             task[i]->thread.sstatus =  csr_read(sstatus);
             //set SUM(bit 18, so kernel mode can access user mode page), 
             //set SPIE(bit 5, so interruption is enabled after sret), 
-            // set SPP to be 0 is not taken into consideration temporarily !
+            // set SPP to be 0, so after calling mret, the system can return to user mode 
             task[i]->thread.sstatus = task[i]->thread.sstatus | 0x00040020; //set SUM(bit 20, so kernel mode can access user mode page)
             csr_write(sstatus, task[i]->thread.sstatus); // ?
             task[i]->thread.sepc =  USER_START;
@@ -93,9 +92,6 @@ void task_init() {
 // arch/riscv/kernel/proc.c
 
 void dummy() {
-
-    // printk("We come to dummy\n");
-
     uint64 MOD = 1000000007;
     uint64 auto_inc_local_var = 0;
     int last_counter = -1;
@@ -133,8 +129,6 @@ void do_timer(void) {
     /* 1. 如果当前线程是 idle 线程 直接进行调度 */
     /* 2. 如果当前线程不是 idle 对当前线程的运行剩余时间减 1 
           若剩余时间任然大于0 则直接返回 否则进行调度 */
-    
-    /* YOUR CODE HERE */
     if (current == idle) {
         // printk("idle will be shedule\n");
         schedule();
@@ -145,8 +139,6 @@ void do_timer(void) {
     else return;
     
 }
-
-// arch/riscv/kernel/proc.c
 
 
 #ifdef SJF

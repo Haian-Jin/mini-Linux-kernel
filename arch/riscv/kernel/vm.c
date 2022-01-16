@@ -108,7 +108,6 @@ void setup_vm_final(void) {
 
     // mapping other memory -|W|R|V
     unsigned long left_length = PHY_SIZE - rodata_length - text_length -OPENSBI_SIZE;   //128 MB - rodata - text
-    // printk("!!!!!!!!!%lx\n", va);
     //printk("other memory: %lx ~ %lx\n", va, va+left_length);
     create_mapping(pgtbl, va, pa, left_length   , 0b0111);
 
@@ -117,7 +116,6 @@ void setup_vm_final(void) {
     temp = ((unsigned long)temp) >> 12;
     temp = (0x000fffffffffff & temp) | 0x8000000000000000; 
 
-    // printk("%lx\n", temp);
     csr_write(satp, temp);
     // flush TLB
     asm volatile("sfence.vma zero, zero");

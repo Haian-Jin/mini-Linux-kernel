@@ -51,8 +51,4 @@ void mm_init(void) {
     kfreerange(_ekernel, (char *)(PHY_END + PA2VA_OFFSET));
     printk("...mm_init done!\n");
     struct run  * temp = kmem.freelist;
-    // while (temp >= 0xffffffe007000000 ) {
-    //     printk("%lx\n", temp);
-    //     temp = temp->next;
-    // }
 }

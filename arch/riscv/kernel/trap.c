@@ -11,14 +11,16 @@ struct pt_regs {
 };
 
 void trap_handler(unsigned long scause, unsigned long sepc, struct pt_regs *regs ) {
-    // 通过 `scause` 判断trap类型
-    // 如果是interrupt 判断是否是timer interrupt
-    // 如果是timer interrupt 则打印输出相关信息, 并通过 `clock_set_next_event()` 设置下一次时钟中断
-    // `clock_set_next_event()` 见 4.5 节
-    // 其他interrupt / exception 可以直接忽略
+    /*
+    Judge the type of trap based on scuase. 
+    If it is the time interruption, call clock_set_next_event() to set the next time interrupt 
+    and decide if the current process needs to be scheduled or not in do_timer() function.
+    Else if it is syscall, then based on system call nember stored in a7, the correponding system call 
+    operation will be executed.
+    This project can only support 2 types of syscall temporarily.
+    */
     if (scause == 0x8000000000000005) {
-        // printk(" kernel is running!\n");
-        // printk("[S] Supervisor Mode Timer Interrupt\n");
+        printk("[S] Supervisor Mode Timer Interrupt\n");
         clock_set_next_event();
         do_timer();
         
@@ -36,7 +38,6 @@ void trap_handler(unsigned long scause, unsigned long sepc, struct pt_regs *regs
                 regs->x[10] = sys_getpid();
 
             }
-
             regs->sepc =(unsigned long)(((unsigned long)regs->sepc) + (unsigned long)0x4);
         }
     }
