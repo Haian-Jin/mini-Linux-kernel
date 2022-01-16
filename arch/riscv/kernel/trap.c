@@ -12,7 +12,7 @@ struct pt_regs {
 
 void trap_handler(unsigned long scause, unsigned long sepc, struct pt_regs *regs ) {
     /*
-    Judge the type of trap based on scuase. 
+    Judge the type of trap based on scause. 
     If it is the time interruption, call clock_set_next_event() to set the next time interrupt 
     and decide if the current process needs to be scheduled or not in do_timer() function.
     Else if it is syscall, then based on system call nember stored in a7, the correponding system call 
